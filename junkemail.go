@@ -3,8 +3,25 @@ package junkemail
 import (
 	"bufio"
 	"embed"
+	"regexp"
 	"strings"
 )
+
+var emailRe = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+
+// IsValidFormat reports whether email has a valid-ish format.
+func IsValidFormat(email string) bool {
+	switch idx := strings.IndexByte(email, '@'); {
+	case email == "":
+		return false
+	case idx == -1 || idx > 64 || len(email) > 254:
+		return false
+	case !emailRe.MatchString(email):
+		return false
+	default:
+		return true
+	}
+}
 
 // Check if a given email is from a junk domain.
 func Check(email string) bool {
